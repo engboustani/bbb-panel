@@ -59,7 +59,7 @@ module.exports = {
      ** See https://axios.nuxtjs.org/options
      */
     axios: {
-        baseURL: 'http://127.0.0.1:3000/api'
+        baseURL: 'http://127.0.0.1:4000/api'
     },
     /*
      ** Build configuration
