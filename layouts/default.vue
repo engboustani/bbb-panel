@@ -1,13 +1,30 @@
 <template>
   <div>
-    <nuxt />
+    <ComponentNavbar />
+    <div class="container">
+      <div class="row">
+        <div class="col-3">
+          <ComponentSidebar />
+        </div>
+        <div class="col-9">
+          <nuxt />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <style>
+body,
 html {
-  font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, 'Helvetica Neue', Arial, sans-serif;
+  direction: rtl;
+  font-family: "Vazir", sans-serif;
+  text-align: right;
+}
+
+html {
+  font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 16px;
   word-spacing: 1px;
   -ms-text-size-adjust: 100%;
