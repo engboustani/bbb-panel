@@ -11,7 +11,8 @@
             id="roomName"
             aria-describedby="nameHelp"
             placeholder="کلاس آنلاین..."
-            v-model="room.name"
+            :class="{ 'is-invalid': $v.room.name.$error }"
+            v-model.trim="$v.room.name.$model"
           />
           <small
             id="nameHelp"
@@ -33,7 +34,8 @@
             type="number"
             class="form-control"
             id="roomCount"
-            v-model="room.observerLimit"
+            :class="{ 'is-invalid': $v.room.observerLimit.$error }"
+            v-model.trim="$v.room.observerLimit.$model"
           />
 
         </div>
@@ -47,7 +49,7 @@
 
         </div>
       </div>
-        <button type="submit" class="btn btn-primary">ثبت</button>
+        <a class="btn btn-primary" href="#" v-on:click="postNewRoom">ثبت</a>
       </form>
     </div>
   </div>
@@ -55,6 +57,7 @@
 
 <script>
 import axios from "axios";
+import { required, minLength, between } from "vuelidate/lib/validators";
 
 export default {
       data: function() {
@@ -71,9 +74,37 @@ export default {
 
     methods: {
         postNewRoom: function() {
-
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        this.$axios
+          .$post(`/rooms`, this.room)
+          .then(response => {
+            console.log(response);
+          })
+          .catch(error => {
+              console.log(error);
+            if (this.$axios.isCancel(error)) {
+              console.log("Request canceled", error);
+            } else {
+              // handle error
+            }
+          });
+      }
         }
-    }
+    },
+
+      validations: {
+          room: {
+            name: {
+                required,
+                minLength: minLength(4)
+            },
+            observerLimit: {
+                required
+            }
+          }
+  }
+
 };
 </script>
 
