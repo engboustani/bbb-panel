@@ -48,32 +48,25 @@
         </div>
         <div class="row">
           <div class="col">
-<div class="spinner-border text-secondary" role="status">
-  <span class="sr-only">Loading...</span>
-</div>
-<ul class="list-group">
-  <li class="list-group-item list-group-item-action" v-for="room in rooms" v-bind:key="room._id">{{room.name}}</li>
-</ul>
-<div class="card bg-light mb-3">
+<ComponentListRooms
+  :listData="rooms"
+  :size="10"
+  :current="currentPage"
+ />
+   <el-pagination
+    layout="prev, pager, next"
+    :total="rooms.length"
+    @current-change="handleCurrentChange">
+  </el-pagination>
+
+<div class="card bg-light mb-3" v-if="rooms.length == 0">
   <div class="card-body">
     <h5 class="card-title">شما روم ندارید</h5>
     <p class="card-text">آیا میخواهید یک روم جدید بسازید؟</p>
     <button type="button" class="btn btn-primary">ساخت</button>
   </div>
 </div>
-<nav aria-label="Page navigation example">
-  <ul class="pagination justify-content-center">
-    <li class="page-item disabled">
-      <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-    </li>
-    <li class="page-item"><a class="page-link" href="#">1</a></li>
-    <li class="page-item"><a class="page-link" href="#">2</a></li>
-    <li class="page-item"><a class="page-link" href="#">3</a></li>
-    <li class="page-item">
-      <a class="page-link" href="#">Next</a>
-    </li>
-  </ul>
-</nav>
+
           </div>
         </div>
       </div>
@@ -84,10 +77,11 @@
 import axios from 'axios';
 
 export default {
-  layout: 'default',
   data: function() {
     return {
-      rooms: []
+      rooms: [],
+      loading: true,
+      currentPage: 1
     }
   },
   asyncData ({ $axios, params }) {
@@ -95,6 +89,12 @@ export default {
       .then((res) => {
         return { rooms: res.data }
       })
+  },
+  methods: {
+      handleCurrentChange(val) {
+        this.currentPage = val;
+      }
+
   }
 };
 </script>

@@ -1,8 +1,11 @@
 <template>
   <div class="card">
     <div class="card-body">
-        <h2>افزودن روم</h2>
       <form>
+        <div class="form-group">
+          <label for="roomID">شناسه روم</label>
+          <h5 id="roomID">{{room.meetingID}}</h5>
+        </div>
         <div class="form-group">
           <label for="roomName">نام روم</label>
           <input
@@ -33,7 +36,8 @@
             type="number"
             class="form-control"
             id="roomCount"
-            v-model="room.observerLimit"
+            value="30"
+            v-model="observerLimit"
           />
 
         </div>
@@ -47,7 +51,7 @@
 
         </div>
       </div>
-        <button type="submit" class="btn btn-primary">ثبت</button>
+        <button type="submit" class="btn btn-primary">بروزسانی</button>
       </form>
     </div>
   </div>
@@ -55,25 +59,26 @@
 
 <script>
 import axios from "axios";
+const isUUID = require('is-uuid');
 
 export default {
-      data: function() {
+  data: function() {
     return {
       id: '',
-      room: {
-          name: '',
-          description: '',
-          observerLimit: 30,
-          recordOption: false
-      }
+      room: {}
     }
   },
+    validate ({ params }) {
+    // Must be a number
+    return isUUID.v4(params.id)
+  },
+  asyncData ({ $axios, params }) {
+    return $axios.get(`/rooms/meeting/${params.id}`)
+      .then((res) => {
+        return { room: res.data, id: params.id }
+      })
+  },
 
-    methods: {
-        postNewRoom: function() {
-
-        }
-    }
 };
 </script>
 

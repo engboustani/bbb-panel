@@ -26,16 +26,20 @@
     "uuid": "^8.1.0",
     "uuid-js": "^0.7.5",
     "vazir-font": "^26.0.2",
+    "vue-persian-datetime-picker": "^2.1.5",
+    "vuejs-paginate": "^2.1.0",
     "vuelidate": "^0.7.5",
     "xml-js": "^1.6.11",
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
-    "nodemon": "^1.18.9",
     "@nuxtjs/eslint-config": "^2.0.0",
     "@nuxtjs/eslint-module": "^1.0.0",
     "babel-eslint": "^10.0.1",
     "eslint": "^6.1.0",
-    "eslint-plugin-nuxt": ">=0.4.2"
+    "eslint-plugin-nuxt": ">=0.4.2",
+    "node-sass": "^4.14.1",
+    "nodemon": "^1.18.9",
+    "sass-loader": "^8.0.2"
   }
 }

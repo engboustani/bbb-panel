@@ -8,6 +8,17 @@ let roomSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    description: {
+        type: String
+    },
+    observerLimit: {
+        type: Number,
+        default: 30
+    },
+    recordOption: {
+        type: Boolean,
+        default: false
+    },
     created: {
         type: Date,
         default: Date.now()

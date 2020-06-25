@@ -1,5 +1,5 @@
 <template>
-  <div class="login-form">
+    <div>
     <div class="control-group" :class="{ 'form-group--error': $v.fullname.$error }">
       <input
         type="text"
@@ -17,8 +17,7 @@
     </div>
 
     <a class="btn btn-primary btn-large btn-block" href="#" v-on:click="join">ورود</a>
-    <a class="btn-light btn-primary btn-large btn-block" href="#">ورود ارائه‌دهنده</a>
-  </div>
+    </div>
 </template>
 
 <script>

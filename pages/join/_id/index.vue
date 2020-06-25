@@ -4,8 +4,13 @@
 				<h1>ورود</h1>
 				<h5>{{room.name}}</h5>
 			</div>
+  <div class="login-form">
 
-			<ComponentJoinObserver :id="id" />
+			<ComponentJoinObserver :id="id" v-if="!typelogin" />
+      <ComponentJoinPersentor :id="id" v-else />
+      <a class="btn-light btn-primary btn-large btn-block" v-on:click="changeType">{{ typelogin ? 'ورود شرکت‌کننده' : 'ورود ارائه‌دهنده' }}</a>
+  </div>
+
 		</div>
 </template>
 
@@ -17,7 +22,8 @@ export default {
   data: function() {
     return {
       id: '',
-      room: {}
+      room: {},
+      typelogin: 0
     }
   },
   validate ({ params }) {
@@ -29,8 +35,12 @@ export default {
       .then((res) => {
         return { room: res.data, id: params.id }
       })
+  },
+  methods: {
+    changeType: function() {
+      this.typelogin = !this.typelogin
+    }
   }
-
 }
 </script>
 

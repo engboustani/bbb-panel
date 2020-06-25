@@ -28,19 +28,27 @@ exports.getRoom = async(req, res) => {
 };
 exports.addNewRoom = async(req, res) => {
     try {
+        let data = req.body;
         let uuid = UUID.create();
         let bbb = {};
         const room = new Room({
-            name: "req.body.name",
+            name: data.name,
             meetingID: uuid,
+            description: data.description,
+            observerLimit: data.observer_limit,
+            recordOption: data.record_option
         });
 
         let newRoom = await room.save();
 
         let params = {
+            name: newRoom.name,
             meetingID: uuid,
             moderatorPW: "persentor",
-            attendeePW: "observer"
+            attendeePW: "observer",
+            welcome: newRoom.description,
+            maxParticipants: newRoom.observerLimit,
+            record: newRoom.recordOption
         }
         let api = new BigBlueButtonApi('https://server1.big-blue.ir/bigbluebutton/api', 'SrXT3AxNqnAPovMP3YGsmdQaiN6iyBnrYEVRFBhY');
         let url = api.urlFor('create', params);

@@ -2,7 +2,7 @@
   <div>
     <ComponentNavbar />
     <div class="container">
-      <div class="row">
+      <div class="row mt-5">
         <div class="col-3">
           <ComponentSidebar />
         </div>
@@ -20,11 +20,13 @@ html {
   direction: rtl;
   font-family: "Vazir", sans-serif;
   text-align: right;
+  background-color: #fff;
+  padding: 0;
+
 }
 
 html {
-  font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: "Vazir", sans-serif;
   font-size: 16px;
   word-spacing: 1px;
   -ms-text-size-adjust: 100%;

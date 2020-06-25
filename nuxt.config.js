@@ -1,3 +1,5 @@
+//import webpack from 'webpack'
+let webpack = require('webpack');
 module.exports = {
     database: "mongodb://localhost:27017/",
     components: true,
@@ -28,6 +30,8 @@ module.exports = {
      ** Global CSS
      */
     css: [
+        'element-ui/packages/theme-chalk/src/base.scss',
+        'element-ui/packages/theme-chalk/src/pagination.scss',
         'bootstrap-v4-rtl/dist/css/bootstrap-rtl.min.css',
         '@fortawesome/fontawesome-free/css/all.min.css',
         'vazir-font/dist/font-face.css'
@@ -36,8 +40,9 @@ module.exports = {
      ** Plugins to load before mounting the App
      */
     plugins: [
-        //'@/plugins/element-ui'
-        '~/plugins/vuelidate'
+        '@/plugins/element-ui',
+        '~/plugins/vuelidate',
+        //'~/plugins/datepicker'
     ],
     /*
      ** Nuxt.js dev-modules
@@ -69,6 +74,12 @@ module.exports = {
         /*
          ** You can extend webpack config here
          */
+        splitChunks: {
+            layouts: true
+        },
+        plugins: [
+            new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
+        ],
         extend(config, ctx) {}
     },
     serverMiddleware: [

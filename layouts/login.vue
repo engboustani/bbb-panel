@@ -1,7 +1,7 @@
 <template>
   	<div class="login">
           <nuxt />
-	</div>
+	  </div>
 </template>
 
 <script>
