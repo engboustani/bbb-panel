@@ -72,7 +72,7 @@ export default {
             });
     },
     getUrl: function (id) {
-      return `/join/${id}`;
+      return `https://panel.big-blue.ir/join/${id}`;
     },
     goJoinUrl: function (id) {
       window.location.href = `/join/${id}`;
