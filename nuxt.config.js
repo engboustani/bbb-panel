@@ -2,6 +2,7 @@
 let webpack = require('webpack');
 module.exports = {
     database: "mongodb://localhost:27017/",
+    //database: "mongodb://127.0.1.1:27017/",
     components: true,
     mode: 'universal',
     server: {
@@ -72,6 +73,7 @@ module.exports = {
      */
     axios: {
         baseURL: 'http://127.0.0.1:4000/api'
+            //baseURL: 'https://panel.big-blue.ir/api'
     },
     /*
      ** Build configuration
