@@ -11,6 +11,8 @@
         </div>
       </div>
     </div>
+    <notifications group="foo" />
+    <v-dialog />
   </div>
 </template>
 

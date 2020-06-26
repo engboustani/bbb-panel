@@ -34,7 +34,8 @@ module.exports = {
         'element-ui/packages/theme-chalk/src/pagination.scss',
         'bootstrap-v4-rtl/dist/css/bootstrap-rtl.min.css',
         '@fortawesome/fontawesome-free/css/all.min.css',
-        'vazir-font/dist/font-face.css'
+        'vazir-font/dist/font-face.css',
+        'vue-popperjs/dist/vue-popper.css',
     ],
     /*
      ** Plugins to load before mounting the App
@@ -42,6 +43,12 @@ module.exports = {
     plugins: [
         '@/plugins/element-ui',
         '~/plugins/vuelidate',
+        '~/plugins/jalali',
+        { src: '~/plugins/notification', mode: 'client' },
+        { src: '~/plugins/modal', mode: 'client' },
+        { src: '~/plugins/paginate', mode: 'client' },
+        { src: '~/plugins/popper', mode: 'client' },
+        { src: '~/plugins/clipboard', mode: 'client' },
         //'~/plugins/datepicker'
     ],
     /*
@@ -80,6 +87,7 @@ module.exports = {
         plugins: [
             new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
         ],
+        transpile: ['vue-notification', 'vue-js-modal', 'vuejs-paginate', 'popper', 'vue-popperjs', 'vue-clipboard2', 'clipboard'],
         extend(config, ctx) {}
     },
     serverMiddleware: [

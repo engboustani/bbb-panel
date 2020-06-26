@@ -18,6 +18,10 @@
             id="nameHelp"
             class="form-text text-muted"
           >We'll never share your email with anyone else.</small>
+                  <div class="invalid-feedback" v-if="!$v.room.name.required" >
+          باید این فیلد حتما وارد شود!
+        </div>
+
         </div>
   <div class="form-group">
     <label for="exampleFormControlTextarea1">پیام خوش‌آمد</label>
@@ -57,7 +61,7 @@
 
 <script>
 import axios from "axios";
-import { required, minLength, between } from "vuelidate/lib/validators";
+import { required, between } from "vuelidate/lib/validators";
 
 export default {
       data: function() {
@@ -75,11 +79,18 @@ export default {
     methods: {
         postNewRoom: function() {
       this.$v.$touch();
-      if (this.$v.$invalid) {
+      if (!this.$v.$invalid) {
         this.$axios
           .$post(`/rooms`, this.room)
           .then(response => {
             console.log(response);
+            this.$notify({
+              group: 'foo',
+              type: 'success',
+              title: 'روم ساخته شد',
+              text: `روم ${this.room.name} ساخته شد.`
+            });
+            this.$router.push({path: `/room/${response.data.meetingID}`});
           })
           .catch(error => {
               console.log(error);
@@ -96,11 +107,11 @@ export default {
       validations: {
           room: {
             name: {
-                required,
-                minLength: minLength(4)
+                required
             },
             observerLimit: {
-                required
+                required,
+                between: between(5, 70)
             }
           }
   }

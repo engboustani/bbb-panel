@@ -35,9 +35,10 @@ export default {
   methods: {
     join: function() {
       this.$v.$touch();
-      if (this.$v.$invalid) {
+      if (!this.$v.$invalid) {
         this.$axios
           .$post(`/rooms/join`, {
+            type: 'observer',
             meetingID: this.id,
             fullname: this.fullname
           })
