@@ -6,7 +6,7 @@ module.exports = {
     database: process.env.MONGODB || 'mongodb://localhost:27017/',
     //database: "mongodb://127.0.1.1:27017/",
     components: true,
-    mode: 'universal',
+    mode: 'spa',
     server: {
         port: process.env.PORT || 4000, // default: 3000
     },
@@ -73,9 +73,9 @@ module.exports = {
         '@nuxtjs/auth',
         '@nuxtjs/proxy',
     ],
-    proxy: [
-        'http://server3.big-blue.ir:4000'
-    ],
+    proxy: {
+        '/api': { target: 'http://127.0.0.1:4000', pathRewrite: { '^/api': '' } }
+    },
     /*
      ** Axios module configuration
      ** See https://axios.nuxtjs.org/options
