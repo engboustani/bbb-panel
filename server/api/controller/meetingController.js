@@ -1,105 +1,93 @@
 let mongoose = require("mongoose");
-const Room = require("../model/Room");
 let Meeting = require("../model/Meeting").Meeting;
 let UUID = require('uuid-js');
 const consola = require('consola');
 let axios = require("axios");
-let convert = require('xml-js');
 var parser = require('fast-xml-parser');
 var he = require('he');
-const attendanceController = require('../controller/attendanceController');
-const meetingController = require('../controller/meetingController');
+var parseString = require('xml2js').parseString;
+
 
 import { BigBlueButtonApi } from './bigbluebutton';
 
-exports.getAllRooms = async(req, res) => {
+exports.create = async(params) => {
     try {
-        let room = await Room.find().sort({ created: -1 });
-        res.status(200).json(room);
+        let bbb = {};
+        const meeting = new Meeting({
+            meetingID: params.room.meetingID,
+            recorded: params.room.recordOption,
+            attendeePW: 'observer',
+            moderatorPW: 'persentor',
+            duration: params.duration,
+            maxParticipants: params.maxParticipants,
+            parent: params.room._id,
+        });
+
+        let newRoomMeeting = await meeting.save();
+
+        return newRoomMeeting;
+
+    } catch (err) {
+        consola.error(err);
+        return err;
+    }
+}
+exports.getAllMeetings = async(req, res) => {
+    try {
+        let meetings = await Meeting.find().populate('parent', 'name');
+        res.status(200).json(meetings);
     } catch (err) {
         res.status(500).json(err);
         consola.error(err);
     }
 };
-exports.getRoom = async(req, res) => {
+exports.getMeeting = async(req, res) => {
     try {
         const id = req.params.meetingID;
-        let room = await Room.findOne({ meetingID: id });
-        res.status(200).json(room);
+        let meeting = await Meeting.findOne({ meetingID: id });
+        res.status(200).json(meeting);
     } catch (err) {
         res.status(500).json(err);
         consola.error(err);
     }
 };
-exports.getRoomMeetings = async(req, res) => {
+exports.addNewMeeting = async(req, res) => {
     try {
-        const id = req.params.meetingID;
-        let room = await Room.findOne({ meetingID: id }).populate('meetings');
-        res.status(200).json(room);
-    } catch (err) {
-        res.status(500).json(err);
-        consola.error(err);
-    }
-};
-exports.addNewRoom = async(req, res) => {
-    try {
-        let data = req.body;
         let uuid = UUID.create();
         let bbb = {};
-        const room = new Room({
-            name: data.name,
+        const meeting = new Meeting({
             meetingID: uuid,
-            description: data.description,
-            observerLimit: data.observer_limit,
-            recordOption: data.record_option
+            persentors: [],
         });
 
+        let newRoomMeeting = await meeting.save();
 
-        await room.save(async function(err) {
-            if (err) return handleError(err);
-
-            uuid = UUID.create();
-
-            let meeting = new Meeting({
-                meetingID: uuid,
-                recorded: room.recordOption,
-                parent: room._id
+        let params = {
+            name: req.name,
+            meetingID: uuid,
+            moderatorPW: "persentor",
+            attendeePW: "observer",
+            welcome: req.description,
+            //logoutURL: `http://127.0.0.1:4000/endroom/${room.meetingID}`,
+            logoutURL: `https://panel.big-blue.ir/endroom/${room.meetingID}`,
+            maxParticipants: newRoom.observerLimit,
+            record: newRoom.recordOption,
+            autoStartRecording: true,
+            allowStartStopRecording: false,
+            webcamsOnlyForModerator: true
+        }
+        let api = new BigBlueButtonApi('https://server1.big-blue.ir/bigbluebutton/api', 'SrXT3AxNqnAPovMP3YGsmdQaiN6iyBnrYEVRFBhY');
+        let url = api.urlFor('create', params);
+        consola.info(url);
+        axios.post(url).then(function(response) {
+                bbb = convert.xml2json(response.data, { compact: true, spaces: 4 });
+                consola.error(bbb);
             })
-            await meeting.save(async function(err) {
-                if (err) return handleError(err);
-                room.meetings.push(meeting._id);
-                await room.save();
+            .catch(function(error) {
+                consola.error(error);
             });
-        });
 
-
-
-        // let params = {
-        //     name: newRoom.name,
-        //     meetingID: uuid,
-        //     moderatorPW: "persentor",
-        //     attendeePW: "observer",
-        //     welcome: newRoom.description,
-        //     //logoutURL: `http://127.0.0.1:4000/endroom/${room.meetingID}`,
-        //     logoutURL: `https://panel.big-blue.ir/endroom/${room.meetingID}`,
-        //     maxParticipants: newRoom.observerLimit,
-        //     record: newRoom.recordOption,
-        //     autoStartRecording: true,
-        //     allowStartStopRecording: false,
-        //     webcamsOnlyForModerator: true
-        // }
-        // let api = new BigBlueButtonApi('https://server1.big-blue.ir/bigbluebutton/api', 'SrXT3AxNqnAPovMP3YGsmdQaiN6iyBnrYEVRFBhY');
-        // let url = api.urlFor('create', params);
-        // consola.info(url);
-        // axios.post(url).then(function(response) {
-        //         bbb = convert.xml2json(response.data, { compact: true, spaces: 4 });
-        //         consola.error(bbb);
-        //     })
-        //     .catch(function(error) {
-        //         consola.error(error);
-        //     });
-
-        res.status(200).json({ data: room });
+        res.status(200).json({ data: newRoom, bbb: bbb });
     } catch (err) {
         res.status(500).json({ error: err });
         consola.error(err);
@@ -130,46 +118,33 @@ exports.deleteRoom = async(req, res) => {
         res.status(500).json(err);
     }
 };
-exports.joinGuest = async(req, res) => {
-    try {
-        const id = req.body.meetingID;
-        let room = await Room.findOne({ meetingID: id });
-        if (!room)
-            res.status(500).json({ error: 'not found room' });
-        const meeting = meetingController.getRunMeeting(room.meetingID);
-        if (meeting !== null)
-            meetingController.create({
-                room,
-                maxParticipants: 50,
-                duration: 60
-            })
-
-        let params = {
-            fullName: req.body.fullname,
-            meetingID: room.meetingID,
-            password: req.body.type
-        }
-        attendanceController.createGuest({
-            meetingID: room._id,
-            name: req.body.fullname
-        });
-
-        const api = new BigBlueButtonApi('https://server1.big-blue.ir/bigbluebutton/api', 'SrXT3AxNqnAPovMP3YGsmdQaiN6iyBnrYEVRFBhY');
-        const url = api.urlFor('join', params);
-        consola.info(url);
-        res.status(200).json({ url: url });
-    } catch (err) {
-        res.status(500).json(err);
-        consola.error(err);
-    }
-
-}
-
 exports.joinPersentor = async(req, res) => {
     try {
         const id = req.body.meetingID;
         let room = await Room.findOne({ meetingID: id });
         let status = "";
+        let params = {
+            meetingID: room.meetingID,
+        }
+        var options = {
+            attributeNamePrefix: "@_",
+            attrNodeName: "attr", //default is 'false'
+            textNodeName: "#text",
+            ignoreAttributes: true,
+            ignoreNameSpace: false,
+            allowBooleanAttributes: false,
+            parseNodeValue: true,
+            parseAttributeValue: false,
+            trimValues: true,
+            cdataTagName: "__cdata", //default is 'false'
+            cdataPositionChar: "\\c",
+            parseTrueNumberOnly: false,
+            arrayMode: false, //"strict"
+            attrValueProcessor: (val, attrName) => he.decode(val, { isAttributeValue: true }), //default is a=>a
+            tagValueProcessor: (val, tagName) => he.decode(val), //default is a=>a
+            stopNodes: ["parse-me-as-string"]
+        };
+
         let api = new BigBlueButtonApi('https://server1.big-blue.ir/bigbluebutton/api', 'SrXT3AxNqnAPovMP3YGsmdQaiN6iyBnrYEVRFBhY');
         let url = api.urlFor('getMeetingInfo', params);
         consola.info(url);
@@ -212,12 +187,6 @@ exports.joinPersentor = async(req, res) => {
                                 meetingID: room.meetingID,
                                 password: req.body.type
                             }
-                            if (req.body.type == 'observer') {
-                                attendanceController.createGuest({
-                                    meetingID: room._id,
-                                    name: req.body.fullname
-                                });
-                            }
                             api = new BigBlueButtonApi('https://server1.big-blue.ir/bigbluebutton/api', 'SrXT3AxNqnAPovMP3YGsmdQaiN6iyBnrYEVRFBhY');
                             url = api.urlFor('join', params);
                             consola.info(url);
@@ -252,6 +221,47 @@ exports.joinPersentor = async(req, res) => {
     }
 };
 
-function create(params) {
+exports.getRunMeeting = async(meetingID) => {
+    var options = {
+        attributeNamePrefix: "@_",
+        attrNodeName: "attr", //default is 'false'
+        textNodeName: "#text",
+        ignoreAttributes: true,
+        ignoreNameSpace: false,
+        allowBooleanAttributes: false,
+        parseNodeValue: true,
+        parseAttributeValue: false,
+        trimValues: true,
+        cdataTagName: "__cdata", //default is 'false'
+        cdataPositionChar: "\\c",
+        parseTrueNumberOnly: false,
+        arrayMode: true, //"strict"
+        attrValueProcessor: (val, attrName) => he.decode(val, { isAttributeValue: true }), //default is a=>a
+        tagValueProcessor: (val, tagName) => he.decode(val), //default is a=>a
+        stopNodes: ["parse-me-as-string"]
+    };
+    let apiparams = {};
+    let api = new BigBlueButtonApi('https://server1.big-blue.ir/bigbluebutton/api', 'SrXT3AxNqnAPovMP3YGsmdQaiN6iyBnrYEVRFBhY');
+    let url = api.urlFor('getMeetings', apiparams);
+    axios.get(url).then(async function(response) {
+        let meetings = [];
+        parseString(response.data, function(err, result) {
+            meetings = result.response.meetings;
+        });
+        if (meetings[0] === '')
+            return null;
+        var result = meetings.find(obj => {
+            return obj.meeting[0].meetingID[0] === meetingID
+        });
+        consola.log(result);
+        if (result == undefined)
+            return null;
 
-};
+        let doc = await Meeting.findOne({ internalMeetingID: result.meeting[0].internalMeetingID[0] });
+        consola.log(doc);
+        return doc;
+    }).catch(function(error) {
+        consola.error(error);
+        return error;
+    });
+}

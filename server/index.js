@@ -2,11 +2,19 @@ const express = require('express')
 const consola = require('consola')
 const { Nuxt, Builder } = require('nuxt')
 const mongoose = require("mongoose");
+const passport = require('passport');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const { localSignup, localLogin, jwtStrategy, jwtUser } = require("./api/passport");
+//const sql = require("./api/sequelize");
+require('dotenv').config();
+
 const app = express()
 
+//global.SQLDB = sql
 
 // Import and Set Nuxt.js options
-const config = require('../nuxt.config.js')
+const config = require('../nuxt.config.js');
 config.dev = process.env.NODE_ENV !== 'production'
 
 //configure database and mongoose
@@ -14,11 +22,17 @@ mongoose.set("useCreateIndex", true);
 mongoose
     .connect(config.database, { useNewUrlParser: true })
     .then(() => {
-        console.log("Database is connected");
+        consola.info("Mongo is connected");
     })
     .catch(err => {
-        console.log({ database_error: err });
+        consola.error({ database_error: err });
     });
+
+passport.use('signup', localSignup);
+passport.use('login', localLogin);
+passport.use(jwtStrategy);
+passport.use(jwtUser);
+
 
 async function start() {
     // Init Nuxt.js
@@ -34,10 +48,17 @@ async function start() {
     }
 
     app.use(express.json());
-    app.use(express.urlencoded({ extended: true }));
+    app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(cookieParser());
+
+    app.use(passport.initialize());
 
     // Give nuxt middleware to express
     app.use(nuxt.render)
+
+    //await sql.sequelize.sync();
+
+
 
     // Listen the server
     app.listen(port, host)

@@ -1,12 +1,14 @@
 //import webpack from 'webpack'
 let webpack = require('webpack');
+require('dotenv').config();
+
 module.exports = {
-    database: "mongodb://localhost:27017/",
+    database: process.env.MONGODB || 'mongodb://localhost:27017/',
     //database: "mongodb://127.0.1.1:27017/",
     components: true,
     mode: 'universal',
     server: {
-        port: 4000, // default: 3000
+        port: process.env.PORT || 4000, // default: 3000
     },
 
     /*
@@ -50,6 +52,7 @@ module.exports = {
         { src: '~/plugins/paginate', mode: 'client' },
         { src: '~/plugins/popper', mode: 'client' },
         { src: '~/plugins/clipboard', mode: 'client' },
+        { src: '~/plugins/chart.js', mode: 'client', ssr: false },
         //'~/plugins/datepicker'
     ],
     /*
@@ -58,14 +61,16 @@ module.exports = {
     buildModules: [
         // Doc: https://github.com/nuxt-community/eslint-module
         //'@nuxtjs/eslint-module'
-        '@nuxt/components'
+        '@nuxt/components',
+        '@nuxtjs/dotenv'
     ],
     /*
      ** Nuxt.js modules
      */
     modules: [
         // Doc: https://axios.nuxtjs.org/usage
-        '@nuxtjs/axios'
+        '@nuxtjs/axios',
+        '@nuxtjs/auth'
     ],
     /*
      ** Axios module configuration
@@ -74,6 +79,37 @@ module.exports = {
     axios: {
         baseURL: 'http://127.0.0.1:4000/api'
             //baseURL: 'https://panel.big-blue.ir/api'
+    },
+    auth: {
+        // Options
+        resetOnError: true,
+        redirect: {
+            login: '/login', // User will be redirected to this path if login is required.
+            home: '/', // User will be redirect to this path after login. (rewriteRedirects will rewrite this path)
+            logout: '/login', // User will be redirected to this path if after logout, current route is protected.
+            user: '/profile',
+            callback: '/callback' // User will be redirect to this path by the identity provider after login. (Should match configured Allowed Callback URLs (or similar setting) in your app/client with the identity provider)
+        },
+        strategies: {
+            local: {
+                endpoints: {
+                    login: {
+                        url: '/auth/login',
+                        method: 'post',
+                        propertyName: 'token'
+                    },
+                    logout: { url: '/auth/logout', method: 'post' },
+                    user: {
+                        url: '/auth/user',
+                        method: 'GET',
+                        propertyName: false
+                    }
+                },
+                tokenRequired: true,
+                tokenType: 'Bearer'
+            }
+
+        },
     },
     /*
      ** Build configuration
@@ -94,5 +130,9 @@ module.exports = {
     },
     serverMiddleware: [
         { path: '/api/rooms', handler: '~/server/api/routes/room.js' },
+        { path: '/api/meetings', handler: '~/server/api/routes/meeting.js' },
+        { path: '/api/auth', handler: '~/server/api/routes/auth.js' },
+        { path: '/api/attendances', handler: '~/server/api/routes/attendance.js' },
+        { path: '/api/reports', handler: '~/server/api/routes/report.js' },
     ]
 }

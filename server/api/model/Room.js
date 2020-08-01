@@ -1,4 +1,6 @@
 let mongoose = require("mongoose");
+let meetingSchema = require("./Meeting").meetingSchema;
+
 let roomSchema = mongoose.Schema({
     name: {
         type: String,
@@ -6,7 +8,8 @@ let roomSchema = mongoose.Schema({
     },
     meetingID: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     description: {
         type: String
@@ -19,6 +22,7 @@ let roomSchema = mongoose.Schema({
         type: Boolean,
         default: false
     },
+    meetings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Meeting' }],
     created: {
         type: Date,
         default: Date.now()

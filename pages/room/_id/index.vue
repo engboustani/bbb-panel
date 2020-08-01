@@ -1,7 +1,9 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <form>
+        <ComponentRoomHeader :id="id" />
+
+      <form class="mt-4">
         <div class="form-group">
           <label for="roomID">شناسه روم</label>
           <h5 id="roomID">{{room.meetingID}}</h5>
