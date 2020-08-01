@@ -1,0 +1,23 @@
+version: "3.1"
+
+services:
+  web:
+    build: .
+    restart: always
+    ports:
+    - "4000:4000"
+    environment:
+      MONGODB: mongodb://root:example@mongo:27017/
+      PORT: 4000
+      BBBSERVER: 
+      BBBSECRET:
+    links:
+    - mongo
+  mongo:
+    image: mongo
+    hostname: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
