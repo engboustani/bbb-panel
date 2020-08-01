@@ -6,12 +6,9 @@ const passport = require('passport');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { localSignup, localLogin, jwtStrategy, jwtUser } = require("./api/passport");
-//const sql = require("./api/sequelize");
 require('dotenv').config();
 
 const app = express()
-
-//global.SQLDB = sql
 
 // Import and Set Nuxt.js options
 const config = require('../nuxt.config.js');
@@ -55,9 +52,6 @@ async function start() {
 
     // Give nuxt middleware to express
     app.use(nuxt.render)
-
-    //await sql.sequelize.sync();
-
 
 
     // Listen the server

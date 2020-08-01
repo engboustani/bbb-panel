@@ -6,6 +6,8 @@ let axios = require("axios");
 var parser = require('fast-xml-parser');
 var he = require('he');
 var parseString = require('xml2js').parseString;
+require('dotenv').config()
+
 
 
 import { BigBlueButtonApi } from './bigbluebutton';
@@ -76,7 +78,7 @@ exports.addNewMeeting = async(req, res) => {
             allowStartStopRecording: false,
             webcamsOnlyForModerator: true
         }
-        let api = new BigBlueButtonApi('https://server1.big-blue.ir/bigbluebutton/api', 'SrXT3AxNqnAPovMP3YGsmdQaiN6iyBnrYEVRFBhY');
+        let api = new BigBlueButtonApi(process.env.BBBSERVER, process.env.BBBSECRET);
         let url = api.urlFor('create', params);
         consola.info(url);
         axios.post(url).then(function(response) {
@@ -145,7 +147,7 @@ exports.joinPersentor = async(req, res) => {
             stopNodes: ["parse-me-as-string"]
         };
 
-        let api = new BigBlueButtonApi('https://server1.big-blue.ir/bigbluebutton/api', 'SrXT3AxNqnAPovMP3YGsmdQaiN6iyBnrYEVRFBhY');
+        let api = new BigBlueButtonApi(process.env.BBBSERVER, process.env.BBBSECRET);
         let url = api.urlFor('getMeetingInfo', params);
         consola.info(url);
         axios.get(url).then(function(response) {
@@ -174,7 +176,6 @@ exports.joinPersentor = async(req, res) => {
                         allowStartStopRecording: 0,
                         webcamsOnlyForModerator: 1
                     }
-                    api = new BigBlueButtonApi('https://server1.big-blue.ir/bigbluebutton/api', 'SrXT3AxNqnAPovMP3YGsmdQaiN6iyBnrYEVRFBhY');
                     url = api.urlFor('create', params);
                     consola.info(url);
                     axios.post(url).then(function(response) {
@@ -187,7 +188,6 @@ exports.joinPersentor = async(req, res) => {
                                 meetingID: room.meetingID,
                                 password: req.body.type
                             }
-                            api = new BigBlueButtonApi('https://server1.big-blue.ir/bigbluebutton/api', 'SrXT3AxNqnAPovMP3YGsmdQaiN6iyBnrYEVRFBhY');
                             url = api.urlFor('join', params);
                             consola.info(url);
                             res.status(200).json({ url: url });
@@ -203,7 +203,6 @@ exports.joinPersentor = async(req, res) => {
                         meetingID: room.meetingID,
                         password: req.body.type
                     }
-                    api = new BigBlueButtonApi('https://server1.big-blue.ir/bigbluebutton/api', 'SrXT3AxNqnAPovMP3YGsmdQaiN6iyBnrYEVRFBhY');
                     url = api.urlFor('join', params);
                     res.status(200).json({ url: url });
                 }
@@ -241,7 +240,7 @@ exports.getRunMeeting = async(meetingID) => {
         stopNodes: ["parse-me-as-string"]
     };
     let apiparams = {};
-    let api = new BigBlueButtonApi('https://server1.big-blue.ir/bigbluebutton/api', 'SrXT3AxNqnAPovMP3YGsmdQaiN6iyBnrYEVRFBhY');
+    let api = new BigBlueButtonApi(process.env.BBBSERVER, process.env.BBBSECRET);
     let url = api.urlFor('getMeetings', apiparams);
     axios.get(url).then(async function(response) {
         let meetings = [];

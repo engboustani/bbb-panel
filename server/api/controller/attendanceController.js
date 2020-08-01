@@ -1,5 +1,7 @@
 let mongoose = require("mongoose");
 const Attendance = require("../model/Attendance").Attendance;
+require('dotenv').config()
+
 
 exports.createGuest = async(params) => {
     try {

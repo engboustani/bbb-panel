@@ -9,6 +9,8 @@ var parser = require('fast-xml-parser');
 var he = require('he');
 const attendanceController = require('../controller/attendanceController');
 const meetingController = require('../controller/meetingController');
+require('dotenv').config()
+
 
 import { BigBlueButtonApi } from './bigbluebutton';
 
@@ -72,33 +74,6 @@ exports.addNewRoom = async(req, res) => {
             });
         });
 
-
-
-        // let params = {
-        //     name: newRoom.name,
-        //     meetingID: uuid,
-        //     moderatorPW: "persentor",
-        //     attendeePW: "observer",
-        //     welcome: newRoom.description,
-        //     //logoutURL: `http://127.0.0.1:4000/endroom/${room.meetingID}`,
-        //     logoutURL: `https://panel.big-blue.ir/endroom/${room.meetingID}`,
-        //     maxParticipants: newRoom.observerLimit,
-        //     record: newRoom.recordOption,
-        //     autoStartRecording: true,
-        //     allowStartStopRecording: false,
-        //     webcamsOnlyForModerator: true
-        // }
-        // let api = new BigBlueButtonApi('https://server1.big-blue.ir/bigbluebutton/api', 'SrXT3AxNqnAPovMP3YGsmdQaiN6iyBnrYEVRFBhY');
-        // let url = api.urlFor('create', params);
-        // consola.info(url);
-        // axios.post(url).then(function(response) {
-        //         bbb = convert.xml2json(response.data, { compact: true, spaces: 4 });
-        //         consola.error(bbb);
-        //     })
-        //     .catch(function(error) {
-        //         consola.error(error);
-        //     });
-
         res.status(200).json({ data: room });
     } catch (err) {
         res.status(500).json({ error: err });
@@ -154,7 +129,7 @@ exports.joinGuest = async(req, res) => {
             name: req.body.fullname
         });
 
-        const api = new BigBlueButtonApi('https://server1.big-blue.ir/bigbluebutton/api', 'SrXT3AxNqnAPovMP3YGsmdQaiN6iyBnrYEVRFBhY');
+        let api = new BigBlueButtonApi(process.env.BBBSERVER, process.env.BBBSECRET);
         const url = api.urlFor('join', params);
         consola.info(url);
         res.status(200).json({ url: url });
@@ -170,7 +145,7 @@ exports.joinPersentor = async(req, res) => {
         const id = req.body.meetingID;
         let room = await Room.findOne({ meetingID: id });
         let status = "";
-        let api = new BigBlueButtonApi('https://server1.big-blue.ir/bigbluebutton/api', 'SrXT3AxNqnAPovMP3YGsmdQaiN6iyBnrYEVRFBhY');
+        let api = new BigBlueButtonApi(process.env.BBBSERVER, process.env.BBBSECRET);
         let url = api.urlFor('getMeetingInfo', params);
         consola.info(url);
         axios.get(url).then(function(response) {
@@ -199,7 +174,6 @@ exports.joinPersentor = async(req, res) => {
                         allowStartStopRecording: 0,
                         webcamsOnlyForModerator: 1
                     }
-                    api = new BigBlueButtonApi('https://server1.big-blue.ir/bigbluebutton/api', 'SrXT3AxNqnAPovMP3YGsmdQaiN6iyBnrYEVRFBhY');
                     url = api.urlFor('create', params);
                     consola.info(url);
                     axios.post(url).then(function(response) {
@@ -218,7 +192,6 @@ exports.joinPersentor = async(req, res) => {
                                     name: req.body.fullname
                                 });
                             }
-                            api = new BigBlueButtonApi('https://server1.big-blue.ir/bigbluebutton/api', 'SrXT3AxNqnAPovMP3YGsmdQaiN6iyBnrYEVRFBhY');
                             url = api.urlFor('join', params);
                             consola.info(url);
                             res.status(200).json({ url: url });
@@ -234,7 +207,6 @@ exports.joinPersentor = async(req, res) => {
                         meetingID: room.meetingID,
                         password: req.body.type
                     }
-                    api = new BigBlueButtonApi('https://server1.big-blue.ir/bigbluebutton/api', 'SrXT3AxNqnAPovMP3YGsmdQaiN6iyBnrYEVRFBhY');
                     url = api.urlFor('join', params);
                     res.status(200).json({ url: url });
                 }

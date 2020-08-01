@@ -1,6 +1,8 @@
 let mongoose = require("mongoose");
 const Attendance = require("../model/Attendance").Attendance;
 const Meeting = require("../model/Meeting").Meeting;
+require('dotenv').config()
+
 
 exports.getReport = async(req, res) => {
     try {
